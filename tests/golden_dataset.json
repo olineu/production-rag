@@ -1,0 +1,27 @@
+[
+  {
+    "question": "What is RAG and why does it exist?",
+    "expected_answer": "RAG stands for Retrieval-Augmented Generation. It solves the problem that language models are frozen at training time and don't know about new or private information. It retrieves relevant documents at query time and injects them into the prompt.",
+    "expected_chunk_contains": "Retrieval-Augmented Generation"
+  },
+  {
+    "question": "What is BM25 and what problem does it solve?",
+    "expected_answer": "BM25 is a keyword search algorithm that scores documents by term frequency. It solves the problem that dense embeddings can miss exact keyword matches, especially for specific product names or technical terms.",
+    "expected_chunk_contains": "BM25"
+  },
+  {
+    "question": "What is RRF and how does it combine retrieval results?",
+    "expected_answer": "RRF stands for Reciprocal Rank Fusion. It merges ranked lists from dense and sparse retrieval using the formula 1/(rank + k), where k=60 dampens the effect of very high ranks. Documents that rank highly in both lists get the highest combined score.",
+    "expected_chunk_contains": "Reciprocal Rank Fusion"
+  },
+  {
+    "question": "What is the difference between a bi-encoder and a cross-encoder?",
+    "expected_answer": "A bi-encoder encodes the query and document independently into single vectors and compares them with cosine similarity — it is fast but approximate. A cross-encoder takes the query and document together as input and produces a single relevance score — it is slower but more accurate.",
+    "expected_chunk_contains": "cross-encoder"
+  },
+  {
+    "question": "What is HNSW and why is it used for vector search?",
+    "expected_answer": "HNSW stands for Hierarchical Navigable Small World. It is an approximate nearest-neighbour index that organises vectors into a multi-layer graph. It allows fast search over millions of vectors in milliseconds, at the cost of occasionally missing the exact nearest neighbour.",
+    "expected_chunk_contains": "HNSW"
+  }
+]

@@ -51,3 +51,10 @@ async def test_ingest_and_query():
             assert "answer" in data
             assert "chunks" in data
             assert len(data["chunks"]) > 0
+
+@pytest.mark.asyncio
+async def test_stats():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.get("/stats")
+    assert response.status_code == 200
+    assert response.json() == {"total_documents": 2,"embedding_model": "text-embedding-3-small","llm_model": "gpt-4o-mini"}

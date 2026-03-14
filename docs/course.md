@@ -1,7 +1,7 @@
 # Production RAG — Personal Course
 
 > Your self-paced curriculum for this project.
-> Goal: understand every file deeply enough to explain it in an FDE interview without notes.
+> Goal: understand every file deeply enough to explain it without notes.
 > Approach: read → understand → modify → break → fix → explain out loud.
 
 ---
@@ -189,9 +189,47 @@ Tests let you change code confidently. Without tests, every change is a guess. W
 Once you've completed all 8 lessons, the project has planned extensions you can build:
 
 1. **pgvector persistence** — replace the in-memory list with a real Postgres database
-2. **Cross-encoder reranking** — add a reranking step after RRF
-3. **Streaming responses** — stream the LLM answer token by token (SSE)
-4. **Eval suite** — measure faithfulness and relevance automatically
-5. **Chunking strategies** — compare fixed-size vs semantic chunking
+2. **Metadata filtering + HNSW index** — filter by date, category, or source before the vector search runs (pre-filtering); add an HNSW approximate nearest-neighbour index on pgvector for fast search at scale. Builds directly on extension 1.
+3. **Cross-encoder reranking** — retrieve 50 candidates, then pass them through a cross-encoder (e.g. BGE-Reranker) to re-sort by true relevance before sending to the LLM. Almost always improves answer quality.
+4. **Streaming responses** — stream the LLM answer token by token (SSE)
+5. **Eval suite** — measure faithfulness and relevance automatically
+6. **Chunking strategies** — compare fixed-size vs semantic chunking
+7. **Instructed Retriever** — propagate system-level instructions (schemas, constraints, access rules) through every stage of the retrieval pipeline, not just the generation step. Research-level; Databricks showed 35–50% recall gains and ~70% end-to-end quality improvement over standard RAG.
 
 Each of these is a real production feature and a separate learning milestone.
+
+---
+
+## Advanced extensions (10–15 min concept sessions)
+
+These are deeper topics — each is a short focused session on the concept, then you extend the project yourself.
+
+**8. Corrective RAG (CRAG)**
+The pipeline currently retrieves and answers blindly — even if the retrieved chunks are irrelevant. CRAG adds a relevance check after retrieval: if the chunks score below a threshold, it either reformulates the query and tries again, or falls back to a web search. Makes the pipeline self-healing.
+- Key concept: retrieval evaluation as a pipeline stage
+- Reference: `corrective-rag` in [ai-engineering-hub](https://github.com/patchy631/ai-engineering-hub)
+
+**9. Trustworthy RAG (hallucination detection)**
+After generation, check whether the answer is actually grounded in the retrieved context. If the LLM made something up, flag it or refuse to return the answer. Closes the loop on answer quality.
+- Key concept: faithfulness scoring (does the answer follow from the context?)
+- Reference: `trustworthy-rag` in ai-engineering-hub
+
+**10. ColBERT retrieval**
+Standard bi-encoders compress the whole document into one vector. ColBERT keeps token-level vectors and compares them at query time (late interaction). More accurate than single-vector retrieval, especially for long documents.
+- Key concept: late interaction vs bi-encoder vs cross-encoder
+- Reference: `colbert-rag` in ai-engineering-hub
+
+**11. Query routing (RAG + SQL)**
+Not every question should go to the vector DB. "How many documents were ingested last week?" is a SQL question. A router classifies the query first, then sends it to the right backend — vector search or SQL — before generating an answer.
+- Key concept: intent classification as a preprocessing step
+- Reference: `rag-sql-router` in ai-engineering-hub
+
+**12. Context engineering**
+The quality of what you send to the LLM matters as much as retrieval quality. This covers: how to order chunks, how to compress context when it's too long, how to structure the system prompt for factual tasks.
+- Key concept: context window as a resource to manage deliberately
+- Reference: `context-engineering-pipeline` in ai-engineering-hub
+
+**13. Multimodal RAG**
+Extend the pipeline to handle PDFs with images, slides, and diagrams — not just plain text. Requires extracting and embedding visual content alongside text.
+- Key concept: multi-modal embeddings, layout-aware chunking
+- Reference: `multi-modal-rag` in ai-engineering-hub
